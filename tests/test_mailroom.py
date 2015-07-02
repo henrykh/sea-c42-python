@@ -1,11 +1,11 @@
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
 
 def process(input):
     p = Popen(['python3', './mailroom.py'],
               stdout=PIPE,
               stdin=PIPE,
-              stderr=PIPE,
+              stderr=STDOUT,
               )
     stdout, stderr = p.communicate(input=input)
     output = stdout.decode().lower()
@@ -16,7 +16,7 @@ def process(input):
 def test_quit():
     output, error = process(b'quit')
 
-    if "eoferror" in error.decode().lower():
+    if error and "eoferror" in error.decode().lower():
         raise AssertionError("Quit unsuccessful")
 
     assert("send a (t)hank you" in output)
@@ -38,7 +38,7 @@ def test_name_quit():
 def test_name_donate():
     output, error = process(b'T\nbill gates\n200\nquit')
 
-    if "eoferror" in error.decode().lower():
+    if error and "eoferror" in error.decode().lower():
         raise AssertionError("Quit unsuccessful")
 
     # name and amount in thank you
@@ -53,7 +53,7 @@ def test_name_donate():
 def test_name_report():
     output, error = process(b'T\nbill gates\n200\nR\nquit')
 
-    if "eoferror" in error.decode().lower():
+    if error and "eoferror" in error.decode().lower():
         raise AssertionError("Quit unsuccessful")
 
     # new donor in report
